@@ -1,5 +1,7 @@
 # git-worktree-share
 
+[![brew][brew-badge]][brew] [![AUR][aur-badge]][AUR]
+
 Share untracked files across [git worktrees] via symlinks.
 
 If you use multiple worktrees, you've probably run into this: config files,
@@ -200,3 +202,7 @@ please, I'll happily use that instead.
 MIT
 
 [git worktrees]: https://git-scm.com/docs/git-worktree
+[brew-badge]: https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fkeithamus%2Fhomebrew-tap%2Fmain%2FFormula%2Fgit-worktree-share.rb&search=%2Fv(%5Cd%2B%5C.%5Cd%2B%5C.%5Cd%2B)%2F&replace=v%241&label=brew
+[brew]: https://github.com/keithamus/homebrew-tap/blob/main/Formula/git-worktree-share.rb
+[aur-badge]: https://img.shields.io/aur/version/git-worktree-share
+[AUR]: https://aur.archlinux.org/packages/git-worktree-share
