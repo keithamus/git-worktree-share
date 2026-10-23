@@ -31,6 +31,15 @@ jobs:
       - name: Test
         run: make test
 
+      - name: Commit version and move tag
+        run: |
+          git diff --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git commit -am "release ${GITHUB_REF_NAME}"
+          git tag -f "$GITHUB_REF_NAME"
+          git push -f origin "refs/tags/$GITHUB_REF_NAME"
+
       - name: Archive
         run: tar -czf git-worktree-share.tar.gz bin/git-worktree-share LICENSE README.md Makefile
 
@@ -41,11 +50,11 @@ jobs:
 
       - name: Commit version to default branch
         run: |
-          git fetch origin "${{ github.event.repository.default_branch }}"
+          branch="${{ github.event.repository.default_branch }}"
+          git push origin "HEAD:$branch" && exit 0
+          git fetch origin "$branch"
           git checkout -f -B version-bump FETCH_HEAD
           sed -i "s/^VERSION=\".*\"$/VERSION=\"${GITHUB_REF_NAME#v}\"/" bin/git-worktree-share
           git diff --quiet && exit 0
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git commit -am "release ${GITHUB_REF_NAME}"
-          git push origin "HEAD:${{ github.event.repository.default_branch }}"
+          git push origin "HEAD:$branch"
