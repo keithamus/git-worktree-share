@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-VERSION="0.1.3"
+VERSION="0.1.4"
 
 COMMON_DIR="$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" && pwd)" || {
 	echo "Error: not inside a git repository" >&2
