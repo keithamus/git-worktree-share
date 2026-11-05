@@ -183,12 +183,10 @@ HOOK
 	case "$action" in
 	install)
 		mkdir -p "$hook_dir"
-		if [ -f "$hook_file" ] && grep -q "git-worktree-share" "$hook_file"; then
-			echo "Hook already installed in $hook_file"
-			return 0
-		fi
 		if [ -f "$hook_file" ]; then
-			echo "$snippet" >>"$hook_file"
+			local existing
+			existing=$(sed '/# git-worktree-share: auto-sync/,/^fi$/d' "$hook_file")
+			printf '%s\n%s\n' "$existing" "$snippet" >"$hook_file"
 		else
 			printf '#!/bin/bash\n%s\n' "$snippet" >"$hook_file"
 			chmod +x "$hook_file"

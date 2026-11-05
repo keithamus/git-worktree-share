@@ -127,7 +127,7 @@ git worktree-share list
 Install a `post-checkout` hook so that `git worktree add` automatically syncs shared files:
 
 ```bash
-git worktree-share hook install    # adds hook to .git/hooks/post-checkout
+git worktree-share hook install    # adds or refreshes hook in .git/hooks/post-checkout
 git worktree-share hook uninstall  # removes it
 ```
 
