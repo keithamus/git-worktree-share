@@ -175,7 +175,7 @@ cmd_hook() {
 
 # git-worktree-share: auto-sync shared files into new worktrees
 if [ "$1" = "0000000000000000000000000000000000000000" ]; then
-    command -v git-worktree-share >/dev/null 2>&1 && git worktree-share sync
+    if command -v git-worktree-share >/dev/null 2>&1; then git worktree-share sync; fi
 fi
 HOOK
 	)

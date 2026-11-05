@@ -159,6 +159,26 @@ output="$("$GIT_WT" hook install)"
 count=$(grep -c "git worktree-share sync" "$common/hooks/post-checkout")
 assert_eq "hook not duplicated" "1" "$count"
 
+echo "test: hook syncs a new worktree when git-worktree-share is on PATH"
+dir="$(setup)"
+cd "$dir/main"
+echo "data" >hooked
+"$GIT_WT" add hooked >/dev/null
+"$GIT_WT" hook install >/dev/null
+mkdir -p "$dir/bin"
+ln -s "$GIT_WT" "$dir/bin/git-worktree-share"
+PATH="$dir/bin:$PATH" git worktree add "$dir/wt3" -b branch3 --quiet 2>/dev/null && status=0 || status=$?
+assert_eq "worktree add succeeds" "0" "$status"
+assert_symlink "new worktree linked" "$dir/wt3/hooked"
+
+echo "test: hook does not fail checkout when git-worktree-share is not on PATH"
+dir="$(setup)"
+cd "$dir/main"
+"$GIT_WT" hook install >/dev/null
+git_dir="$(dirname "$(command -v git)")"
+PATH="$git_dir" git worktree add "$dir/wt3" -b branch3 --quiet 2>/dev/null && status=0 || status=$?
+assert_eq "worktree add succeeds" "0" "$status"
+
 echo "test: add rejects git-tracked files"
 dir="$(setup)"
 cd "$dir/main"
