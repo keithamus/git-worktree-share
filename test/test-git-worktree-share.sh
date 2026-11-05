@@ -159,6 +159,33 @@ output="$("$GIT_WT" hook install)"
 count=$(grep -c "git worktree-share sync" "$common/hooks/post-checkout")
 assert_eq "hook not duplicated" "1" "$count"
 
+echo "test: hook install upgrades an old hook block"
+dir="$(setup)"
+cd "$dir/main"
+common="$(git rev-parse --git-common-dir)"
+mkdir -p "$common/hooks"
+cat >"$common/hooks/post-checkout" <<'OLD'
+#!/bin/bash
+echo user-hook
+
+# git-worktree-share: auto-sync shared files into new worktrees
+if [ "$1" = "0000000000000000000000000000000000000000" ]; then
+    command -v git-worktree-share >/dev/null 2>&1 && git worktree-share sync
+fi
+OLD
+chmod +x "$common/hooks/post-checkout"
+"$GIT_WT" hook install >/dev/null
+assert_eq "old block replaced, user content kept" '#!/bin/bash
+echo user-hook
+
+# git-worktree-share: auto-sync shared files into new worktrees
+if [ "$1" = "0000000000000000000000000000000000000000" ]; then
+    if command -v git-worktree-share >/dev/null 2>&1; then git worktree-share sync; fi
+fi' "$(cat "$common/hooks/post-checkout")"
+before="$(cat "$common/hooks/post-checkout")"
+"$GIT_WT" hook install >/dev/null
+assert_eq "reinstall is stable" "$before" "$(cat "$common/hooks/post-checkout")"
+
 echo "test: hook syncs a new worktree when git-worktree-share is on PATH"
 dir="$(setup)"
 cd "$dir/main"
