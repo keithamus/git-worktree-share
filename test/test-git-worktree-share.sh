@@ -215,6 +215,18 @@ output="$("$GIT_WT" add tracked-file 2>&1)" && status=0 || status=$?
 assert_eq "exits with error" "1" "$status"
 assert_eq "error message" "Error: tracked-file is tracked by git — only untracked files can be shared" "$output"
 
+echo "test: add and rm a directory given with a trailing slash"
+dir="$(setup)"
+cd "$dir/main"
+mkdir confdir && echo "x" >confdir/inner
+"$GIT_WT" add confdir/ >/dev/null
+assert_eq "manifest entry has no trailing slash" "confdir" "$("$GIT_WT" list)"
+assert_symlink "wt1/confdir is symlink" "$dir/wt1/confdir"
+assert_eq "status reports ok" "  ok  confdir" "$("$GIT_WT" status | grep -m1 confdir)"
+"$GIT_WT" rm confdir// >/dev/null
+assert_eq "rm matches entry" "No tracked files" "$("$GIT_WT" list)"
+assert_file_exists "restored to main" "$dir/main/confdir/inner"
+
 echo ""
 echo "Results: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
