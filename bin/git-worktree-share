@@ -21,6 +21,12 @@ get_worktrees() {
 	git worktree list --porcelain | awk 'BEGIN{RS="";FS="\n"} {b=0; for(i=2;i<=NF;i++) if($i=="bare") b=1; if(!b) print substr($1,10)}'
 }
 
+strip_trailing_slashes() {
+	local p="$1"
+	while [[ "$p" == */ ]]; do p="${p%/}"; done
+	printf '%s' "$p"
+}
+
 sync_worktree() {
 	local wt_dir="$1"
 	local changed=false
@@ -211,18 +217,20 @@ HOOK
 
 case "${1:-help}" in
 add | track)
-	[ -z "${2:-}" ] && {
+	file="$(strip_trailing_slashes "${2:-}")"
+	[ -z "$file" ] && {
 		echo "Usage: git worktree-share add <file>"
 		exit 1
 	}
-	cmd_add "$2"
+	cmd_add "$file"
 	;;
 rm | untrack)
-	[ -z "${2:-}" ] && {
+	file="$(strip_trailing_slashes "${2:-}")"
+	[ -z "$file" ] && {
 		echo "Usage: git worktree-share rm <file>"
 		exit 1
 	}
-	cmd_rm "$2"
+	cmd_rm "$file"
 	;;
 sync)
 	cmd_sync
